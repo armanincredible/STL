@@ -1,4 +1,4 @@
-CFLAGS ?=-Wextra -g -fsanitize=address -fno-elide-constructors -Wall -fstack-protector-all -fno-stack-protector -pedantic -fwrapv --param ssp-buffer-size=4 -fvisibility=hidden -Wcast-align -Wmissing-field-initializers -Wshadow -Wswitch-enum -O0
+CFLAGS ?=-Wextra -g -fsanitize=undefined -fsanitize=address -fno-elide-constructors -Wall -fstack-protector-all -fno-stack-protector -pedantic -fwrapv --param ssp-buffer-size=4 -fvisibility=hidden -Wcast-align -Wmissing-field-initializers -Wshadow -Wswitch-enum -O0
 
 C_SRCS := $(sort $(wildcard *.cpp))
 C_OBJS := ${C_SRCS:.cpp=.o}

@@ -4,29 +4,29 @@
 #include "iterator.h"
 #include "reverse_iterator.h"
 #include <iostream>
+#include "allocator.h"
 
 struct out_of_range
 {
 
 };
 
-template <typename T, class Allocator = std::allocator<T>>
-class Vector
+template <typename T, template <typename U> class MemStorage = DynamicStorage>
+class Vector: private MemStorage<T>
 {
 private:
     T* data_ = NULL;
     size_t size_ = 0;
     size_t capacity_ = 0;
-    Allocator allocator_;
+    //Allocator allocator_;
+    //using allocator_ *this;
 
     int special_allocate_into(T** data, size_t size)
     {
         try{
-            *data = allocator_.allocate(size);
+            *data = MemStorage<T>::allocate(size);
         } 
         catch (const std::bad_alloc& e) {
-            capacity_ = 0;
-            size_ = 0;
             return -1;
         }
         return 0;
@@ -42,7 +42,7 @@ private:
         if (new_size == 0)
         {
             if (capacity_ != 0)
-                allocator_.deallocate(data_, capacity_);
+                MemStorage<T>::deallocate(data_, capacity_);
             return 0;
         }
 
@@ -59,7 +59,7 @@ private:
         }
         
         if (capacity_ != 0)
-            allocator_.deallocate(data_, capacity_);
+            MemStorage<T>::deallocate(data_, capacity_);
 
         data_ = new_vec;
         capacity_ = new_size;
@@ -139,7 +139,7 @@ public:
     {
         if (capacity_ != 0)
         {
-            allocator_.deallocate(data_, capacity_);
+            MemStorage<T>::deallocate(data_, capacity_);
         }
     }
 
@@ -293,7 +293,7 @@ public:
         return data_[size_ - 1];
     }
 
-    Vector<T>& operator=(const Vector<T>& arg)
+    Vector& operator=(const Vector& arg)
     {
         if (this == &arg)
         {
@@ -317,7 +317,7 @@ public:
     }
 
 
-    Vector<T>& operator=(Vector<T>&& arg)
+    Vector& operator=(Vector&& arg)
     {
         if (this == &arg)
         {

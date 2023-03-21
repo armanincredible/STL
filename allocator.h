@@ -33,8 +33,9 @@ template <typename T>
 class StaticStorage 
 {
 private:
-    size_t N = 20;
-    alignas(T) char m_data[20 * sizeof(T)];
+    #define SIZE 1000
+    alignas(T) char m_data[SIZE * sizeof(T)];
+    size_t offset = 0;
 public:
     // Type definitions
     using value_type = T;
@@ -47,27 +48,26 @@ public:
     ~StaticStorage () noexcept {}
 
     // Copy constructor and assignment operator
-    template <typename U>
-    StaticStorage(const StaticStorage<U>& other) noexcept {}
+    StaticStorage(const StaticStorage& other) noexcept {}
 
-    template <typename U>
-    StaticStorage& operator=(const StaticStorage<U>& other) noexcept { return *this; }
+    StaticStorage& operator=(const StaticStorage& other) noexcept { return *this; }
 
     // Allocate and deallocate memory
     pointer allocate(size_type n) {
-        if (n > N) {
+        if (n > SIZE - offset) {
             throw std::bad_alloc();
         }
-        return reinterpret_cast<pointer>(m_data);
+        offset += n;
+        return reinterpret_cast<pointer>(m_data + offset - n);
     }
 
     void deallocate(pointer p, size_type n) {}
 
     // Get maximum number of elements that can be allocated
-    size_type max_size() const noexcept { return N; }
+    size_type max_size() const noexcept { return SIZE; }
 };
 
-
+/*
 template <typename T, template <typename U> class MemStorage = DynamicStorage>
 class Allocator : public MemStorage<T>
 {
@@ -82,3 +82,4 @@ public:
     Allocator() noexcept {}
     ~Allocator() noexcept {}
 };
+*/

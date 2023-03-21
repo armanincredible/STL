@@ -3,15 +3,58 @@
 #include <gtest/gtest.h>
 #include "allocator.h"
 
-TEST(Allocator, ctor)
+TEST(Allocator, Static)
 {
-    Vector<int, Allocator<int, StaticStorage>> v({ 1, 2, 3, 4 });
+    Vector<int, StaticStorage> v({ 1, 2, 3, 4 });
     EXPECT_EQ(1, v.get_elem(0));
     EXPECT_EQ(2, v.get_elem(1));
     EXPECT_EQ(3, v.get_elem(2));
     EXPECT_EQ(4, v.get_elem(3));
-
+	v.push_back('4');
+	v.push_back('3');
+	v.push_back('2');
+	v.push_back('1');
+	EXPECT_EQ(8, v.get_size());
 }
+
+TEST(Allocator, StaticAllocatorThrow)
+{
+    Vector<int, StaticStorage> v({ 1, 2, 3, 4 });
+	for (size_t i = 0; i < 1000; i++)
+	{
+		v.push_back('1');
+	}
+	EXPECT_NE(0, v.get_size());
+}
+
+TEST(Allocator, DynamicStdVector)
+{
+    std::vector<int, DynamicStorage<int>> v({ 1, 2, 3, 4 });
+    EXPECT_EQ(1, v.at(0));
+    EXPECT_EQ(2, v.at(1));
+    EXPECT_EQ(3, v.at(2));
+    EXPECT_EQ(4, v.at(3));
+	v.push_back('4');
+	v.push_back('3');
+	v.push_back('2');
+	v.push_back('1');
+	EXPECT_EQ(8, v.size());
+}
+
+TEST(Allocator, StaticStdVector)
+{
+    std::vector<int, StaticStorage<int>> v({ 1, 2, 3, 4 });
+    EXPECT_EQ(1, v.at(0));
+    EXPECT_EQ(2, v.at(1));
+    EXPECT_EQ(3, v.at(2));
+    EXPECT_EQ(4, v.at(3));
+	v.push_back('4');
+	v.push_back('3');
+	v.push_back('2');
+	v.push_back('1');
+	EXPECT_EQ(8, v.size());
+}
+
 
 // Constructors
 TEST(Vector, ctor)
@@ -89,7 +132,7 @@ TEST(Iterators, std_copy)
         //std::cout << "Copy completed successfully" << std::endl;
     }
     catch(const std::exception& e){
-        //std::cerr << "Exception caught: " << e.what() << std::endl;
+        std::cerr << "Exception caught: " << e.what() << std::endl;
     }
 
     EXPECT_EQ(from_vector.get_elem(0), to_vector.get_elem(0));
